@@ -4,6 +4,7 @@ import json
 import threading
 import subprocess
 import shutil
+from html.parser import HTMLParser
 from pathlib import Path
 
 import pytest
@@ -269,6 +270,62 @@ def test_editor_exposes_all_schedule_fields_without_external_assets(portal):
     assert "textContent" in script
     assert "innerHTML" not in script
     assert "r.device_uuids = r.device_uuids.map" in script
+
+def test_portal_identifies_bin_collection_and_reminder_scope(portal):
+    page = request(portal, "GET", "/")[2].decode()
+    class PageText(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.parts = []
+
+        def handle_data(self, data):
+            self.parts.append(data)
+
+    parser = PageText()
+    parser.feed(page)
+    visible_text = " ".join(" ".join(parser.parts).split())
+    assert "<title>Bin Day | Garbage &amp; Recycling Reminders</title>" in page
+    assert "Never miss collection day." in visible_text
+    assert "garbage and recycling pickup" in visible_text
+    assert "Pickup schedules" in visible_text
+    assert "Cast displays" in visible_text
+    assert "pickup reminders" in visible_text
+    assert "aria-hidden=\"true\"" in page  # decorative bin motif stays out of the accessibility tree
+
+def test_new_collection_uses_bin_pickup_defaults_without_changing_existing_data():
+    if not shutil.which("node"):
+        pytest.skip("Node.js needed to exercise browser editor")
+    script = Path(__file__).parents[1] / "src/static/app.js"
+    js = r"""
+const fs = require('fs');
+class Element {
+  constructor(tag) { this.tag = tag; this.children = []; this.listeners = {}; this.value = ''; }
+  append(child) { this.children.push(child); }
+  replaceChildren() { this.children = []; }
+  addEventListener(name, fn) { this.listeners[name] = fn; }
+  querySelector(tag) { return this.children.find(child => child.tag === tag); }
+}
+const roots = Object.fromEntries(['general','devices','collections','message','add-device','add-collection','discover','candidates','save'].map(id => [id, new Element('root')]));
+global.document = {getElementById: id => roots[id], createElement: tag => new Element(tag)};
+const existing = {id:'old', label:'Paper', category:'Recycling', text:'Set out paper', color:'#112233', recurrence:{kind:'weekly',weekday:2}, reminders:[]};
+global.fetch = async path => ({ok: true, json: async () => path === '/api/config' ? {config: {version:2, timezone:'Etc/UTC', devices:[], collections:[existing]}, revision:null} : {csrf_token:'token'}});
+const source = fs.readFileSync(process.argv[1], 'utf8');
+eval(source.replace(/\binit\(\);\s*$/, '') + `\n global.run = async () => {
+  await init();
+  roots['add-collection'].listeners.click();
+  console.log(JSON.stringify(config.collections));
+};`);
+run().catch(error => { console.error(error); process.exitCode = 1; });
+"""
+    existing, created = json.loads(subprocess.check_output(["node", "-e", js, str(script)], text=True))
+    assert existing == {"id": "old", "label": "Paper", "category": "Recycling", "text": "Set out paper",
+                        "color": "#112233", "recurrence": {"kind": "weekly", "weekday": 2}, "reminders": []}
+    created_id = created.pop("id")
+    assert created_id != existing["id"]
+    assert created == {"label": "New pickup schedule", "category": "Garbage",
+                       "text": "Garbage pickup is coming up. Put your bin out.", "color": "#56c3a6",
+                       "recurrence": {"kind": "weekly", "weekday": 0}, "reminders": []}
+    validate_real_config({"version": 2, "timezone": "Etc/UTC", "devices": [], "collections": [{"id": created_id, **created}]})
 
 
 def test_complex_v2_config_round_trip_and_revision_header(portal):

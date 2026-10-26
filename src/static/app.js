@@ -54,7 +54,7 @@ function render() {
   for (const name of ['general', 'devices', 'collections']) $(name).replaceChildren();
   field($('general'), 'Timezone (IANA)', config.timezone, v => config.timezone = v);
   const devices = $('devices');
-  if (!config.devices.length) node('p', devices, 'No devices yet. Add one to target your reminders.', 'empty');
+  if (!config.devices.length) node('p', devices, 'No Cast displays yet. Add one to show pickup reminders.', 'empty');
   for (const d of config.devices) {
     const card = node('div', devices, undefined, 'device-card');
     const row = node('div', card, undefined, 'grid three');
@@ -73,19 +73,19 @@ function render() {
     }, 'danger');
   }
   const collections = $('collections');
-  if (!config.collections.length) node('p', collections, 'No collections yet. Create one to get started.', 'empty');
+  if (!config.collections.length) node('p', collections, 'No pickup schedules yet. Add a garbage or recycling collection day to get started.', 'empty');
   for (const c of config.collections) {
     const card = node('article', collections, undefined, 'collection');
     const head = node('div', card, undefined, 'card-head');
-    node('h3', head, c.label || 'Untitled collection');
+    node('h3', head, c.label || 'Untitled pickup schedule');
     button(head, 'Delete collection', () => { config.collections = config.collections.filter(x => x !== c); render(); }, 'danger');
     const grid = node('div', card, undefined, 'grid two');
-    field(grid, 'Collection label', c.label, v => { c.label = v; head.querySelector('h3').textContent = v || 'Untitled collection'; });
-    field(grid, 'Category', c.category, v => c.category = v);
-    field(grid, 'Message text', c.text, v => c.text = v);
+    field(grid, 'Pickup schedule label', c.label, v => { c.label = v; head.querySelector('h3').textContent = v || 'Untitled pickup schedule'; });
+    field(grid, 'Bin type / category', c.category, v => c.category = v);
+    field(grid, 'Reminder message', c.text, v => c.text = v);
     field(grid, 'Accent color', c.color, v => c.color = v, 'color');
     const rec = node('div', card, undefined, 'recurrence');
-    node('h4', rec, 'Recurrence');
+    node('h4', rec, 'Collection day recurrence');
     const recGrid = node('div', rec, undefined, 'grid three');
     select(recGrid, 'Frequency', c.recurrence.kind, [['weekly','Weekly'],['biweekly','Every two weeks'],['monthly','Monthly']], kind => {
       c.recurrence = kind === 'monthly' ? {kind, day_of_month: 1} : kind === 'biweekly' ? biweeklyDefault() : {kind, weekday: 0}; render();
@@ -99,13 +99,13 @@ function render() {
       });
     if (c.recurrence.kind === 'biweekly') field(recGrid, 'Anchor date', c.recurrence.anchor_date, v => c.recurrence.anchor_date = v, 'date');
     if (c.recurrence.kind === 'monthly') field(recGrid, 'Day of month', c.recurrence.day_of_month, v => c.recurrence.day_of_month = v, 'number', {min:1,max:31});
-    const title = node('div', card, undefined, 'section-head reminders-title'); node('h4', title, 'Reminders');
+    const title = node('div', card, undefined, 'section-head reminders-title'); node('h4', title, 'Reminder timing');
     button(title, '+ Add reminder', () => { c.reminders.push({id:id(), lead_days:1, start_time:'18:00', repeat_for_minutes:60, every_minutes:15, display_seconds:30, device_uuids:[]}); render(); });
     if (!c.reminders.length) node('p', card, 'No reminders yet.', 'empty');
     for (const r of c.reminders) {
       const entry = node('div', card, undefined, 'reminder');
       const row = node('div', entry, undefined, 'grid three');
-      field(row, 'Lead days', r.lead_days, v => r.lead_days = v, 'number', {min:0});
+      field(row, 'Days before pickup', r.lead_days, v => r.lead_days = v, 'number', {min:0});
       field(row, 'Start time', r.start_time, v => r.start_time = v, 'time');
       field(row, 'Repeat for (minutes)', r.repeat_for_minutes, v => r.repeat_for_minutes = v, 'number', {min:0});
       field(row, 'Every (minutes)', r.every_minutes, v => r.every_minutes = v, 'number', {min:1});
@@ -135,7 +135,7 @@ async function init() {
   } catch (e) { message('Unable to open configuration: ' + e.message, true); }
 }
 $('add-device').addEventListener('click', () => { if (!config) return; config.devices.push({uuid:id(),label:'New screen'}); render(); });
-$('add-collection').addEventListener('click', () => { if (!config) return; config.collections.push({id:id(),label:'New collection',category:'Reminder',text:'Your reminder',color:'#56c3a6',recurrence:{kind:'weekly',weekday:0},reminders:[]}); render(); });
+$('add-collection').addEventListener('click', () => { if (!config) return; config.collections.push({id:id(),label:'New pickup schedule',category:'Garbage',text:'Garbage pickup is coming up. Put your bin out.',color:'#56c3a6',recurrence:{kind:'weekly',weekday:0},reminders:[]}); render(); });
 $('discover').addEventListener('click', async () => {
   try {
     const result = await api('/api/discover'); const area = $('candidates'); area.replaceChildren();

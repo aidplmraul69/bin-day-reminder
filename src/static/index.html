@@ -1,3 +1,33 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Reminder Studio</title><link rel="stylesheet" href="/static/style.css"></head>
-<body><div class="shell"><header><div class="brand"><span class="mark">✳</span><div><strong>Reminder Studio</strong><small>LOCAL CONFIGURATION</small></div></div><span class="status">● &nbsp; Local admin</span></header><main><section class="hero"><div class="eyebrow">SCHEDULE CONTROL</div><h1>Make every reminder<br><em>land right on time.</em></h1><p>Choose what appears, when it repeats, and which screens receive it.</p></section><div id="message" role="status" aria-live="polite"></div><section class="panel"><div class="section-head"><div><h2>General settings</h2><p>Dates and times use this timezone.</p></div></div><div id="general"></div></section><section class="panel"><div class="section-head"><div><h2>Cast devices</h2><p>Add your screens manually or discover candidates. Discovery never adds a device automatically.</p></div><div class="actions"><button id="discover" type="button" class="secondary">Discover devices</button><button id="add-device" type="button">+ Add device</button></div></div><div id="candidates"></div><div id="devices"></div></section><section class="panel"><div class="section-head"><div><h2>Collections</h2><p>Plan the message and the recurrence, then add delivery reminders.</p></div><button id="add-collection" type="button">+ New collection</button></div><div id="collections"></div></section><footer><span>Changes are local until saved.</span><button id="save" type="button" class="primary">Save configuration</button></footer></main></div><script src="/static/app.js" defer></script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bin Day | Garbage &amp; Recycling Reminders</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><span class="mark" aria-hidden="true">♻</span><div><strong>Bin Day</strong><small>GARBAGE &amp; RECYCLING REMINDERS</small></div></div>
+      <span class="status">● &nbsp; Local admin</span>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="eyebrow">GARBAGE + RECYCLING PICKUP</div>
+          <h1 id="hero-title">Never miss<br><em>collection day.</em></h1>
+          <p>Set your garbage and recycling pickup schedule, then send reminders to your Cast displays before it’s time to put the bins out.</p>
+        </div>
+        <div class="bin-art" aria-hidden="true"><span class="bin-art__spark">✳</span><span class="bin-art__lid"></span><span class="bin-art__body"><span>♻</span></span><span class="bin-art__ground"></span></div>
+      </section>
+      <div id="message" role="status" aria-live="polite"></div>
+      <section class="panel"><div class="section-head"><div><h2>General settings</h2><p>Pickup dates and reminder times use this timezone.</p></div></div><div id="general"></div></section>
+      <section class="panel"><div class="section-head"><div><h2>Cast displays</h2><p>Choose the screens that show your pickup reminders. Discovery never adds a device automatically.</p></div><div class="actions"><button id="discover" type="button" class="secondary">Discover devices</button><button id="add-device" type="button">+ Add display</button></div></div><div id="candidates"></div><div id="devices"></div></section>
+      <section class="panel"><div class="section-head"><div><h2>Pickup schedules</h2><p>Set each garbage or recycling collection day, then choose when its reminders appear.</p></div><button id="add-collection" type="button">+ New pickup schedule</button></div><div id="collections"></div></section>
+      <footer><span>Changes are local until saved.</span><button id="save" type="button" class="primary">Save configuration</button></footer>
+    </main>
+  </div>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
