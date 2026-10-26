@@ -1,5 +1,7 @@
 # Bin Day Reminder
 
+![telegram-cloud-photo-size-4-5978756078931480858-y](https://github.com/user-attachments/assets/2c6b3e6b-e9b3-48a9-8042-f37c4410e2a8)
+
 A long-running service with a **loopback-only configuration portal**, a durable reminder scheduler, and a separate LAN JPEG server for Google Cast. Configure collection dates (weekly, biweekly, monthly), reminder lead days, message/color, repeat interval, display duration, and multiple explicit device UUIDs. Cast hardware behavior varies and has **not** been verified by offline tests.
 
 ## Quick start (Linux Docker Engine)
