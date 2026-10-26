@@ -1,0 +1,8 @@
+# Send only code and runtime dependencies to the Docker daemon.
+*
+!Dockerfile
+!requirements.txt
+!src/
+!src/**
+**/__pycache__/
+**/*.py[cod]

@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "timezone": "Etc/UTC",
+  "devices": [
+    {"uuid": "replace-with-exact-cast-uuid", "label": "Example display"}
+  ],
+  "collections": [
+    {
+      "id": "example-paper",
+      "label": "Paper collection",
+      "category": "Paper",
+      "text": "Put the paper bin out",
+      "color": "#72a9e8",
+      "recurrence": {"kind": "biweekly", "weekday": 1, "anchor_date": "2026-10-20"},
+      "reminders": [
+        {
+          "id": "evening-before",
+          "lead_days": 1,
+          "start_time": "18:00",
+          "repeat_for_minutes": 60,
+          "every_minutes": 15,
+          "display_seconds": 30,
+          "device_uuids": ["replace-with-exact-cast-uuid"]
+        }
+      ]
+    }
+  ]
+}

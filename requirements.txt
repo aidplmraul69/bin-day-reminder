@@ -1,0 +1,2 @@
+Pillow>=11,<14
+pychromecast>=9.4,<15

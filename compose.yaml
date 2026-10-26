@@ -1,0 +1,31 @@
+services:
+  reminder:
+    build: .
+    network_mode: host # Linux host networking for Cast/mDNS; admin binds 127.0.0.1 only
+    restart: unless-stopped
+    user: "65532:65532"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - reminder-data:/data
+    environment:
+      MEDIA_PORT: ${MEDIA_PORT:-8080}
+    command:
+      - --data-dir
+      - /data
+      - --advertise-host
+      - ${LAN_HOST:?Set LAN_HOST to a host/LAN address reachable by Cast devices}
+      - --media-port
+      - ${MEDIA_PORT:-8080}
+      - --admin-port
+      - ${ADMIN_PORT:-8765}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:'+os.environ['MEDIA_PORT']+'/healthz',timeout=3).close()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  reminder-data:
