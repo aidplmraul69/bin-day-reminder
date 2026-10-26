@@ -71,7 +71,8 @@ class ReminderService:
         return raw
 
     def _send(self, slot, collection, device):
-        image = render_bytes(collection.category, collection.text, collection.color, slot.when)
+        image = render_bytes(collection.category, collection.text, collection.color,
+                             slot.when, slot.collection_date)
         path = self.media.publish(image)
         host = self.advertise_host
         if ":" in host:  # IPv6 URL literal

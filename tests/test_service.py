@@ -1,12 +1,14 @@
 """Integration tests for the assembled service; no Cast devices contacted."""
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 import http.client
 import json
 import threading
+from types import SimpleNamespace
 from urllib.request import urlopen
 
 import pytest
 
+import src.service as service_module
 from src.service import ReminderService
 
 
@@ -51,6 +53,21 @@ def test_service_http_save_reload_schedule_image_and_shutdown(tmp_path):
         conn.close()
     assert service.scheduler.stop_event.is_set()
     assert service.store.load()[0] == config
+
+
+def test_send_passes_pickup_date_to_renderer(monkeypatch):
+    sent = []
+    monkeypatch.setattr(service_module, "render_bytes", lambda *args, **kwargs: sent.append((args, kwargs)) or b"jpeg")
+    service = object.__new__(ReminderService)
+    service.advertise_host = "example.test"
+    service.media = SimpleNamespace(port=8080, publish=lambda data: "/card.jpg", remove=lambda path: None)
+    service.cast = SimpleNamespace(run=lambda *args: None)
+    service.scheduler = SimpleNamespace(stop_event=threading.Event())
+    when = datetime(2026, 10, 26, 23, tzinfo=timezone.utc)
+    slot = SimpleNamespace(when=when, collection_date=date(2026, 10, 27), display_seconds=10)
+    collection = SimpleNamespace(category="Paper", text="Take out paper", color="#3377DD")
+    service._send(slot, collection, SimpleNamespace(uuid="demo"))
+    assert sent == [(("Paper", "Take out paper", "#3377DD", when, date(2026, 10, 27)), {})]
 
 
 def test_advertised_host_must_not_be_loopback_or_unspecified(tmp_path):

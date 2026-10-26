@@ -1,4 +1,4 @@
-# Cast collection reminders
+# Bin Day Reminder
 
 A long-running service with a **loopback-only configuration portal**, a durable reminder scheduler, and a separate LAN JPEG server for Google Cast. Configure collection dates (weekly, biweekly, monthly), reminder lead days, message/color, repeat interval, display duration, and multiple explicit device UUIDs. Cast hardware behavior varies and has **not** been verified by offline tests.
 

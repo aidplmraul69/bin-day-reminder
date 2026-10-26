@@ -66,7 +66,7 @@ def test_long_text_wraps_within_card_and_indicates_overflow(monkeypatch):
     description = "Please separate every reusable item before collection. " * 40
     render_bytes(category, description, "#abcdef", None)
     body = [(xy, text, face) for xy, text, face in calls
-            if xy[1] >= 175 and text != "REMINDER"]
+            if 175 <= xy[1] <= 460]  # exclude the separate pickup-date footer
     assert len(body) > 2  # multiple lines rather than a single clipped string
     assert any("écologique" in text for _, text, _ in body)
     assert any("reusable" in text for _, text, _ in body)
